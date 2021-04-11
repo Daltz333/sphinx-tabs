@@ -1,5 +1,8 @@
 import pytest
 from sphinx.application import Sphinx
+import sphinx
+
+above_sphinx_v3 = int(sphinx.__version__.split(".")[0]) > 3
 
 
 @pytest.mark.sphinx(testroot="basic")
@@ -21,8 +24,17 @@ def test_conditional_assets(app, docname, check_asset_links):
         check_asset_links(app, filename=docname + ".html", present=False)
 
 
+@pytest.mark.skipif(above_sphinx_v3, reason="linenos formatting changed in sphinx 4")
 @pytest.mark.sphinx(testroot="linenos")
-def test_other_with_assets(app, check_asset_links):
+def test_linenos_sphinx3(app, check_asset_links):
+    check_asset_links(app)
+
+
+@pytest.mark.skipif(
+    not above_sphinx_v3, reason="linenos formatting changed in sphinx 4"
+)
+@pytest.mark.sphinx(testroot="linenos")
+def test_linenos_sphinx4(app, check_asset_links):
     check_asset_links(app)
 
 
